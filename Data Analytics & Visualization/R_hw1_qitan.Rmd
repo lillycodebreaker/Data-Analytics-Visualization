@@ -1,0 +1,82 @@
+---
+title: "Homework Assignment 1"
+author: "Qi Tan"
+date: "2023-09-28"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r Creating Data}
+# TASK 0 =======
+# Load in 3 pre-filtered vectors for cases, county names, and vaccination rates
+load("/Users/qtan/Documents/_ltan/fuqua/R/Module 1/NC_Covid_Data_Sep-4-2021.RData")
+
+# case_count - Provided by NC department of public health, shows the rate of COVID infections per 100k residents by county
+# vaccination_rate - Provided by the CDC, shows the % of residents that are fully vaccinated by county
+# nc_county_list - Shows the county name for each entry in the case count and vaccination vectors.
+# i.e. the first entry in nc_county_list is 'Transylvania' meaning the first value in the case_count and vaccination rate correspond to Transylvania County
+
+# TASK 1 =======
+# averages
+# ? shouldn't the list be vaccination_rate, not case_count because the name is nc_average_vax ? 
+nc_average_vax = mean(vaccination_rate)
+# ? Get average cases?
+# answer: mean is the function to get averages 
+# answer: in this case, the answer is 40.446 
+nc_average_cases = mean(case_count) 
+  
+# ? which county has the highest vaccination rate?
+# answer: I use filtered vector to find vaccination_rate equals to maximum vaccination_rate 
+# answer: then I use the filter to apply to the country list to get the country name 
+# answer: the answer is "Martin" 
+filter_value = vaccination_rate == max(vaccination_rate)
+nc_county_list_filtered = nc_county_list[filter_value]
+
+# TASK 2 =======
+# Filter function
+# ? Found this on Stack overflow... No idea how it works!
+# answer: This function is filtering through the country name with the filt_countries list 
+# answer: it then filters down the corresponding other vectors, either vaccine rate list or case count list 
+filter_func = function(input_vector, county_names, filt_counties){
+  filt = county_names %in% filt_counties
+  output_vector = input_vector[filt]
+  return(output_vector)
+}
+
+durham_counties = c("Wake", "Granville", "Person", "Orange", "Chatham", "Durham")
+
+# ? what are the sizes of the resulting vectors? Are they the same size?
+filtered_cases = filter_func(input_vector = case_count,
+                             county_names = nc_county_list, 
+                             filt_counties = durham_counties)
+
+filtered_vax = filter_func(input_vector = vaccination_rate,
+                           county_names = nc_county_list, 
+                           filt_counties = durham_counties)
+
+# answer: answer is yes, since you are filtering by the same duram_countries list. the
+# corresponding filtered list from nc_county_list that matches durham_counties 
+# are the same, size of 6. when you apply size 6 to both vectors, you get same vector size 6 
+
+# Task 3 ======
+# Plots
+plot(x = vaccination_rate, 
+     y = case_count,
+     pch = 20,
+     main = "Vaccination Rates vs COVID Infection Rates",
+     xlab = 'Vaccination Rate (%)',
+     ylab = 'COVID Infection Rate (Per 100k)'
+     )
+
+for (i in 1:length(durham_counties)){
+  #from i=1 to 6
+  points(x = filtered_vax[i], y = filtered_cases[i], pch = 8, col = 'blue')
+  text(x = filtered_vax[i], y = filtered_cases[i], labels = durham_counties[i],
+       cex=.9, font=1.5, pos=4)
+}
+#  ? what does this mean?
+# answer: we want to highlight where the filtered durham countries are listed, e.g. the 6 countries, their vaccine and case as blue stars, display the country label as well on the plot 
+```
